@@ -186,9 +186,82 @@
 </head>
 <body>
     <div class="container">
-        <img src="https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=romantic%20young%20couple%20kissing%20tenderly%2C%20warm%20soft%20lighting%2C%20pink%20and%20purple%20bokeh%20background%2C%20anime%20style%20illustration%2C%20dreamy%20atmosphere%2C%20hearts%20floating%20around%2C%20sweet%20and%20loving%20moment%2C%20beautiful%20detailed%20art&image_size=square_hd" 
-             alt="幸福情侣" class="couple-image"
-             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><text y=%22.9em%22 font-size=%22150%22>💑</text></svg>'">
+        <svg class="couple-image" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="幸福情侣">
+            <defs>
+                <radialGradient id="bgGrad" cx="50%" cy="42%" r="65%">
+                    <stop offset="0%" stop-color="#ffd1e8"/>
+                    <stop offset="55%" stop-color="#ff8ec7"/>
+                    <stop offset="100%" stop-color="#9b5de5"/>
+                </radialGradient>
+                <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#fff" stop-opacity="0.6"/>
+                    <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ff5d8f"/>
+                    <stop offset="100%" stop-color="#c026d3"/>
+                </linearGradient>
+            </defs>
+            <circle cx="160" cy="160" r="150" fill="url(#bgGrad)"/>
+            <circle cx="160" cy="160" r="150" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+            <circle cx="160" cy="150" r="120" fill="url(#glow)"/>
+            <path d="M118 100
+                     C98 108 86 140 94 178
+                     C100 214 90 234 108 244
+                     C114 247 122 244 126 238
+                     L134 220
+                     C130 206 130 194 138 184
+                     C146 176 154 174 156 166
+                     C157 160 153 156 156 150
+                     C160 143 163 138 158 133
+                     C153 126 148 118 142 112
+                     C136 104 126 98 118 100 Z"
+                  fill="#4a235a" opacity="0.96"/>
+            <path d="M118 100
+                     C108 102 98 116 96 134
+                     C94 158 104 180 116 196
+                     C124 208 130 222 134 238
+                     C138 232 138 214 138 196
+                     C130 182 134 168 144 158
+                     C150 150 150 138 146 126
+                     C142 114 132 102 118 100 Z"
+                  fill="#2c1640" opacity="0.55"/>
+            <path d="M202 100
+                     C222 108 234 140 226 178
+                     C220 214 230 234 212 244
+                     C206 247 198 244 194 238
+                     L186 220
+                     C190 206 190 194 182 184
+                     C174 176 166 174 164 166
+                     C163 160 167 156 164 150
+                     C160 143 157 138 162 133
+                     C167 126 172 118 178 112
+                     C184 104 194 98 202 100 Z"
+                  fill="#2c1640" opacity="0.96"/>
+            <path d="M202 100
+                     C212 102 222 116 224 134
+                     C226 158 216 180 204 196
+                     C196 208 190 222 186 238
+                     C182 232 182 214 182 196
+                     C190 182 186 168 176 158
+                     C170 150 170 138 174 126
+                     C178 114 188 102 202 100 Z"
+                  fill="#1a0e2b" opacity="0.5"/>
+            <path d="M160 150
+                     C154 142 142 144 142 155
+                     C142 166 160 178 160 178
+                     C160 178 178 166 178 155
+                     C178 144 166 142 160 150 Z"
+                  fill="url(#heartGrad)"/>
+            <circle cx="100" cy="96" r="3" fill="#fff" opacity="0.8"/>
+            <circle cx="232" cy="108" r="2.5" fill="#fff" opacity="0.7"/>
+            <circle cx="86" cy="200" r="2.5" fill="#fff" opacity="0.6"/>
+            <circle cx="240" cy="206" r="3" fill="#fff" opacity="0.7"/>
+            <text x="112" y="262" font-size="22">💕</text>
+            <text x="182" y="68" font-size="20">💖</text>
+            <text x="60" y="150" font-size="16">✨</text>
+            <text x="256" y="156" font-size="16">✨</text>
+        </svg>
         
         <h1 class="title">我 爱 你 ❤</h1>
         
