@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我爱你 ❤</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #fda085 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        .couple-image {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.5),
+                        0 0 80px rgba(255, 182, 193, 0.3);
+            border: 6px solid rgba(255, 255, 255, 0.4);
+            animation: float 4s ease-in-out infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 4px 20px rgba(255, 20, 147, 0.6),
+                         0 0 40px rgba(255, 182, 193, 0.5);
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 1.5s ease forwards 0.5s;
+        }
+
+        .love-text {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 2;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            text-shadow: 0 2px 10px rgba(255, 105, 180, 0.4);
+            opacity: 0;
+            animation: fadeInUp 1.5s ease forwards 1.2s;
+        }
+
+        .love-text p {
+            margin-bottom: 10px;
+        }
+
+        .heart-btn {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5);
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 1.5s ease forwards 2s, pulse 2s ease-in-out infinite 3.5s;
+            font-weight: bold;
+        }
+
+        .heart-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.7);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5); }
+            50% { box-shadow: 0 10px 50px rgba(255, 107, 157, 0.9), 0 0 30px rgba(255, 182, 193, 0.6); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating-heart {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            animation: floatUp 4s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) scale(1.5) rotate(360deg);
+            }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .big-heart {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            font-size: 0;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+            pointer-events: none;
+        }
+
+        .big-heart.show {
+            animation: heartBurst 1s ease-out forwards;
+        }
+
+        @keyframes heartBurst {
+            0% { font-size: 0; opacity: 1; }
+            50% { font-size: 20rem; opacity: 0.8; }
+            100% { font-size: 25rem; opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.2rem;
+            }
+            .love-text {
+                font-size: 1.1rem;
+                padding: 0 20px;
+            }
+            .couple-image {
+                width: 240px;
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=romantic%20young%20couple%20kissing%20tenderly%2C%20warm%20soft%20lighting%2C%20pink%20and%20purple%20bokeh%20background%2C%20anime%20style%20illustration%2C%20dreamy%20atmosphere%2C%20hearts%20floating%20around%2C%20sweet%20and%20loving%20moment%2C%20beautiful%20detailed%20art&image_size=square_hd" 
+             alt="幸福情侣" class="couple-image"
+             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><text y=%22.9em%22 font-size=%22150%22>💑</text></svg>'">
+        
+        <h1 class="title">我 爱 你 ❤</h1>
+        
+        <div class="love-text">
+            <p>遇见你，是我生命中最美好的事情</p>
+            <p>你的笑容是我每天最期待的风景</p>
+            <p>愿与你共度每一个春夏秋冬</p>
+            <p>此生有你，便是圆满 💕</p>
+        </div>
+        
+        <button class="heart-btn" onclick="showLove()">点我收下我的心意 💝</button>
+    </div>
+
+    <script>
+        function createSparkles() {
+            const body = document.body;
+            for (let i = 0; i < 50; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 3 + 's';
+                sparkle.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                body.appendChild(sparkle);
+            }
+        }
+
+        function createHeart(x, y) {
+            const hearts = ['❤️', '💕', '💖', '💗', '💓', '💝', '🌹'];
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            heart.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 4000);
+        }
+
+        function showLove() {
+            const bigHeart = document.createElement('div');
+            bigHeart.className = 'big-heart show';
+            bigHeart.textContent = '❤️';
+            document.body.appendChild(bigHeart);
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * window.innerWidth;
+                    const y = window.innerHeight;
+                    createHeart(x, y);
+                }, i * 100);
+            }
+            
+            setTimeout(() => bigHeart.remove(), 1000);
+        }
+
+        document.addEventListener('click', (e) => {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createHeart(e.clientX + (Math.random() - 0.5) * 100, 
+                               e.clientY + (Math.random() - 0.5) * 50);
+                }, i * 50);
+            }
+        });
+
+        setInterval(() => {
+            const x = Math.random() * window.innerWidth;
+            createHeart(x, window.innerHeight);
+        }, 800);
+
+        createSparkles();
+    </script>
+</body>
+</html>
