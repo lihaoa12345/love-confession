@@ -169,6 +169,78 @@
             100% { font-size: 25rem; opacity: 0; }
         }
 
+        .music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            background: linear-gradient(135deg, #ff6fa8, #c026d3);
+            color: #fff;
+            font-size: 1.4rem;
+            cursor: pointer;
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(192, 38, 211, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.08);
+        }
+
+        .music-toggle.playing {
+            animation: spin 6s linear infinite, musicPulse 2s ease-in-out infinite;
+        }
+
+        .music-toggle.paused {
+            opacity: 0.7;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 6px 20px rgba(192, 38, 211, 0.5); }
+            50% { box-shadow: 0 6px 30px rgba(255, 105, 180, 0.9), 0 0 20px rgba(255, 182, 193, 0.6); }
+        }
+
+        .music-hint {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(74, 35, 90, 0.82);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            z-index: 300;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            animation: hintBounce 1.8s ease-in-out infinite;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .music-hint.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+        }
+
+        @keyframes hintBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-6px); }
+        }
+
         @media (max-width: 768px) {
             .title {
                 font-size: 2.2rem;
@@ -180,6 +252,13 @@
             .couple-image {
                 width: 240px;
                 height: 240px;
+            }
+            .music-toggle {
+                width: 46px;
+                height: 46px;
+                font-size: 1.2rem;
+                top: 14px;
+                right: 14px;
             }
         }
     </style>
@@ -199,6 +278,10 @@
         
         <button class="heart-btn" onclick="showLove()">点我收下我的心意 💝</button>
     </div>
+
+    <button class="music-toggle paused" id="musicToggle" aria-label="背景音乐开关" title="背景音乐">🎵</button>
+
+    <div class="music-hint" id="musicHint">🎵 点击任意处，开启浪漫音乐</div>
 
     <script>
         function createSparkles() {
@@ -257,6 +340,167 @@
             const x = Math.random() * window.innerWidth;
             createHeart(x, window.innerHeight);
         }, 800);
+
+        const musicToggle = document.getElementById('musicToggle');
+        const musicHint = document.getElementById('musicHint');
+        let audioCtx = null;
+        let masterGain = null;
+        let delayGain = null;
+        let isPlaying = false;
+        let schedulerTimer = null;
+        let nextNoteTime = 0;
+        let step = 0;
+        const tempo = 76;
+        const lookahead = 25;
+        const scheduleAheadTime = 0.2;
+
+        const N = {
+            C3:130.81,D3:146.83,E3:164.81,F3:174.61,G3:196.00,A3:220.00,B3:246.94,
+            C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392.00,A4:440.00,B4:493.88,
+            C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880.00,B5:987.77,
+            C6:1046.50
+        };
+
+        const chords = [
+            { root: N.C3, pad: [N.C4, N.E4, N.G4], melody: [N.E5, N.G5, N.C6, N.C6, N.G5, N.E5, 0, 0] },
+            { root: N.G3, pad: [N.G4, N.B4, N.D5], melody: [N.D5, N.B4, N.G4, N.G4, N.B4, N.D5, 0, 0] },
+            { root: N.A3, pad: [N.A4, N.C5, N.E5], melody: [N.E5, N.C5, N.A4, N.A4, N.C5, N.E5, 0, 0] },
+            { root: N.F3, pad: [N.F4, N.A4, N.C5], melody: [N.C5, N.A4, N.F4, N.F4, N.A4, N.C5, 0, 0] }
+        ];
+
+        function setMusicUI(playing) {
+            if (playing) {
+                musicToggle.classList.add('playing');
+                musicToggle.classList.remove('paused');
+                musicToggle.textContent = '🎶';
+            } else {
+                musicToggle.classList.remove('playing');
+                musicToggle.classList.add('paused');
+                musicToggle.textContent = '🎵';
+            }
+        }
+
+        function hideHint() {
+            musicHint.classList.add('hidden');
+            setTimeout(() => musicHint.remove(), 700);
+        }
+
+        function initAudio() {
+            if (audioCtx) return;
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new Ctx();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.0;
+            masterGain.connect(audioCtx.destination);
+
+            const delay = audioCtx.createDelay(1.0);
+            delay.delayTime.value = 0.28;
+            const feedback = audioCtx.createGain();
+            feedback.gain.value = 0.32;
+            delayGain = audioCtx.createGain();
+            delayGain.gain.value = 0.28;
+            delay.connect(feedback);
+            feedback.connect(delay);
+            delay.connect(delayGain);
+            delayGain.connect(masterGain);
+        }
+
+        function playNote(freq, time, duration, volume, type) {
+            if (!freq) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type || 'triangle';
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0.0001, time);
+            gain.gain.linearRampToValueAtTime(volume, time + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0008, time + duration);
+
+            osc.connect(gain);
+            gain.connect(masterGain);
+            gain.connect(delayGain);
+            osc.start(time);
+            osc.stop(time + duration + 0.05);
+        }
+
+        function scheduleStep(s, time) {
+            const chord = chords[Math.floor(s / 8)];
+            const pos = s % 8;
+            const eighth = 60.0 / tempo / 2;
+
+            if (pos === 0) {
+                playNote(chord.root, time, eighth * 6, 0.16, 'sine');
+                chord.pad.forEach((n, i) => {
+                    playNote(n, time + i * 0.035, eighth * 2, 0.05, 'triangle');
+                });
+            }
+
+            const mel = chord.melody[pos];
+            if (mel) {
+                playNote(mel, time, eighth * 1.6, 0.22, 'triangle');
+                playNote(mel * 2, time, eighth * 1.2, 0.05, 'sine');
+            }
+        }
+
+        function scheduler() {
+            while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+                scheduleStep(step, nextNoteTime);
+                nextNoteTime += 60.0 / tempo / 2;
+                step = (step + 1) % 32;
+            }
+            schedulerTimer = setTimeout(scheduler, lookahead);
+        }
+
+        function startMusic() {
+            if (isPlaying) return;
+            initAudio();
+            const begin = () => {
+                if (audioCtx.state !== 'running') return;
+                isPlaying = true;
+                step = 0;
+                nextNoteTime = audioCtx.currentTime + 0.1;
+                masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+                masterGain.gain.setValueAtTime(Math.max(masterGain.gain.value, 0.0001), audioCtx.currentTime);
+                masterGain.gain.linearRampToValueAtTime(0.9, audioCtx.currentTime + 1.2);
+                scheduler();
+                setMusicUI(true);
+                hideHint();
+            };
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(begin).catch(() => {});
+            } else {
+                begin();
+            }
+        }
+
+        function pauseMusic() {
+            if (!isPlaying) return;
+            isPlaying = false;
+            clearTimeout(schedulerTimer);
+            if (audioCtx) {
+                masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+                masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
+                masterGain.gain.linearRampToValueAtTime(0.0, audioCtx.currentTime + 0.4);
+            }
+            setMusicUI(false);
+        }
+
+        musicToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isPlaying) pauseMusic(); else startMusic();
+        });
+
+        const firstInteract = () => {
+            startMusic();
+            window.removeEventListener('pointerdown', firstInteract);
+            window.removeEventListener('touchstart', firstInteract);
+            window.removeEventListener('keydown', firstInteract);
+        };
+        window.addEventListener('pointerdown', firstInteract);
+        window.addEventListener('touchstart', firstInteract);
+        window.addEventListener('keydown', firstInteract);
+
+        try { startMusic(); } catch (e) {}
 
         createSparkles();
     </script>
